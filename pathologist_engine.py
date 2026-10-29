@@ -105,11 +105,10 @@ class PlantPathologistClient:
         b64_img = self.encode_image(image)
 
         prompt = (
-            "You are an expert botanist and plant pathologist. Analyze this plant leaf in detail. "
-            "1. What plant or crop species is it? "
-            "2. Is the leaf healthy or distressed? "
-            "3. Detail all visual distress symptoms: leaf color (deep green, pale, yellowing, browning), "
-            "spots or lesions (black, brown, circular spots), webbing, stippling, pest damage, curling, or holes."
+            "Describe the health and appearance of the plant in this photo. "
+            "Include visible leaf colors, any spots, browning, yellowing, holes or insects, "
+            "and where those changes are located. If the leaves look healthy, say so. "
+            "Name the plant only if recognizable. Do not invent symptoms or treatments."
         )
 
         payload = {
@@ -121,7 +120,7 @@ class PlantPathologistClient:
         }
 
         try:
-            with httpx.Client(timeout=45.0) as client:
+            with httpx.Client(timeout=110.0) as client:
                 resp = client.post(f"{self.base_url}/api/generate", json=payload)
                 resp.raise_for_status()
                 data = resp.json()
@@ -169,6 +168,11 @@ class PlantPathologistClient:
         elif "ficus" in v_lower or "rubber" in v_lower:
             plant_name = "Ficus (Moraceae)"
 
+        # Remove explicit negations before symptom matching. Otherwise "no black
+        # spots" is incorrectly classified as a positive fungal observation.
+        v_lower = re.sub(
+            r"\b(?:no|without|no signs of|no evidence of)\s+[^.;\n]+", "", v_lower
+        )
         # 2. Symptom scoring
         has_black_spots = any(w in v_lower for w in ["black spot", "dark spot", "brown spot", "lesion", "circular spot", "spots on it", "necrotic"])
         has_yellowing = any(w in v_lower for w in ["yellow", "yellowish", "pale", "chlorosis", "chlorotic", "yellow tint", "discoloration"])
@@ -258,18 +262,15 @@ class PlantPathologistClient:
         else:
             return PlantDiagnosisResult(
                 plant_name=plant_name,
-                health_status="Mild Stress / Environmental Acclimation",
-                severity="Low",
-                primary_issue="Minor Environmental or Moisture Stress",
-                visual_symptoms=[
-                    "Subtle tonal variation or slight edge distress detected by vision model",
-                    "Overall leaf architecture remains largely intact"
-                ],
+                health_status="Undetermined — insufficient visual evidence",
+                severity="Undetermined",
+                primary_issue="No reliable condition could be inferred from the model observations",
+                visual_symptoms=[],
                 remediation_steps=[
-                    "Place in consistent bright, indirect sunlight away from cold drafts or HVAC vents",
-                    "Maintain stable watering schedule tailored to current season",
-                    "Monitor for changes over the next 7 days"
+                    "Retake a close-up photo of one leaf in even natural light",
+                    "Include both sides of the affected leaf",
+                    "Compare with recent growth and seek advice if damage spreads"
                 ],
-                prognosis="Favorable recovery outlook with minor environmental calibration.",
+                prognosis="A clearer image or an in-person examination is needed.",
                 raw_vision_analysis=vision_text
             )

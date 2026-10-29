@@ -13,7 +13,7 @@ class PlantDiagnosisResult(BaseModel):
     )
     severity: str = Field(
         default="Moderate",
-        description="Severity level: Healthy, Low, Moderate, High, or Critical.",
+        description="Screening level: Healthy, Low, Moderate, High, Critical, or Undetermined.",
     )
     primary_issue: str = Field(
         default="No acute distress identified",
