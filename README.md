@@ -190,23 +190,3 @@ smart-plant-pathologist/
 │   └── architecture.md       # Processing and report flow
 └── design/                   # Design reference, notes and app screenshot
 ```
-
-## 📚 Learn more
-
-- [🛠️ Architecture and processing flow](docs/architecture.md)
-- [🎨 Design system and visual direction](design/design-system.md)
-- [🖼️ Full workspace screenshot](design/inspection-desktop.png)
-- [📡 Local API documentation](http://localhost:8801/docs) — available while the server is running.
-
-## 📜 Licensing
-
-This repository currently contains **no project license file**. No MIT or other open-source license is implied. Check the licenses of dependencies, model weights and bundled photographs before reuse or redistribution.
-
-## ✅ To do
-
-- [ ] Integrate a trained leaf/lesion detector for disease-specific localization.
-- [ ] Evaluate a plant disease classifier and calibrate its probabilities on labeled data.
-- [ ] Benchmark species recognition and screening quality across varied plants and lighting.
-- [ ] Validate camera capture across desktop and mobile browsers.
-- [ ] Validate installation on additional operating systems and hardware.
-- [ ] Add longitudinal comparisons between inspections of the same plant.
